@@ -1,6 +1,9 @@
 #include <ctime>
 #include <cstdlib>
 #include "rsleep.h"
+#include <iostream>
+#include <ostream>
+
 
 void randsleep() {
   int r = rand();
