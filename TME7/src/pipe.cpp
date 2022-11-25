@@ -41,14 +41,23 @@ int main(int argc,char ** argv) {
 	if (pipe (tubeDesc) == -1) {
 		perror ("pipe"); exit (1);
 	}
-
-	if (fork() == 0) {
+	int pid_1;
+	if (pid_1 = fork() == 0) {
 		dup2(tubeDesc[0],0);
+		close(tubeDesc[1]);
 		execv(arg2[0],arg2);
 		perror("exec1 didn't work");exit(1);
-	} else {
+	}
+	if (fork() == 0) {
 		dup2(tubeDesc[1],1);
+		close(tubeDesc[0]);
 		execv(arg1[0],arg1);
 		perror("exec2 didn't work");exit(1);	
 	}
+
+	close(tubeDesc[0]);
+	close(tubeDesc[1]);
+
+	int pid = wait(NULL);
+	wait(NULL);
 }
