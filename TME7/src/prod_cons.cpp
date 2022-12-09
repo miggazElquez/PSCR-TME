@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <vector>
+#include <sys/mman.h>
 
 
 using namespace std;
@@ -23,7 +24,30 @@ void consomateur (Stack<char> * stack) {
 }
 
 int main () {
-	Stack<char> * s = new Stack<char>();
+
+	int fd;
+	if ((fd = shm_open("/monshm", O_RDWR | O_CREAT,0600)) == -1) {
+		perror("Error");
+		exit(1);
+	}
+
+	if (ftruncate(fd, sizeof(Stack<char>)) == -1) {
+		perror("ftruncate");
+		exit(1);
+	}
+
+	void *ptr;
+	if ((ptr =  mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+		perror("mmap");
+		exit(1);
+	}
+
+	memset(ptr, 0, sizeof(Stack<char>));
+
+	Stack<char> *s = new (ptr) Stack<char>();
+
+
+
 
 	pid_t pp = fork();
 	if (pp==0) {
